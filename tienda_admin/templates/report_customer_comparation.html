@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="background-color: #ececec">
+
+	  <form class="form-inline" method="POST">
+
+			{% csrf_token %}
+			<div class="col-sm-12 table-responsive">
+		
+				<table class="table">
+					<thead>
+						<tr><th><h2>  Relatório Comparativo Vendas por Expositor</h2><small style="color: grey">relatório por período para comparar expositores que mais obteram vendas</small></tr></th>
+					</thead>
+					<tbody>
+					<tr class="col-sm-12 table-responsive">
+						<td>
+							<label>Data Inicio: </label>
+							<input id="data_datepicker_inicio" type = 'date' name='input_date_inicio' value="" required>
+						</td>
+						<td>
+							<label>Data Final: </label>
+							<input id="data_datepicker_final" type = 'date' name='input_date_final' value="" required>
+						</td>
+						<td>
+							<br>
+							<button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_create_report">Visualizar</button>	
+						</td>
+						{% if report_customer %}
+						<td> 
+						 <br>
+						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_customer_comparation&date_input_inicio={{ start_date }}&date_input_final={{ end_date }}&filename_name=relatorio_comparativo_vendas_expositor_&sheet_name=Comparativo&obj_html=<table>{% for inputs in report_customer %}<tr><td>{{ inputs.customer__store_name }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>">Exportar</a>
+						</td>
+					{% endif %}
+					</tr>
+				</tbody>
+
+				</table>
+
+
+
+
+
+</form>
+</div>
+<hr style="border-color: #f4511e">
+</div>
+</div><br>
+
+<!-- ############################################################################################################ -->
+
+
+{% if report_customer %}
+<h3>Comparativo Vendas de {{ start_date_date|date:"d M Y" }} à {{ end_date_date|date:"d M Y" }}</h3>
+<div>    
+  <table class="table table-striped">
+	<thead>
+		<hr>
+		<input id="searchInput" type="text" placeholder="Pesquisar..">
+	  <tr>
+		<th>Expositor</th>
+		<th>Venda Total</th>
+	  </tr>
+	</thead>
+	<tbody id="id_table">
+	{% for inputs in report_customer %}
+	  <tr>
+		<td name="{{ inputs.customer__store_name }}">{{ inputs.customer__store_name }}</td>
+		<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
+	  </tr>
+	{% endfor %}
+		
+
+	</tbody>
+  </table>
+
+</div>
+
+
+{% endif %}
+
+<!-- #######################################################################################################################-->
+
+
+
+<style>
+#id-link-btn-xls:link, #id-link-btn-xls:visited {
+  background-color: #47C758;
+  color: white;
+  padding: 3px 11px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+
+#id-link-btn-xls:hover, #id-link-btn-xls:active {
+  background-color: green;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+	// In your Javascript (external .js resource or <script> tag) MUITO IMPORTANTE FAZ O DROPDOWN DAR PRA FAZER AUTOCOMPLETE
+    $('.js-example-basic-single').select2();
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+	
+
+
+});
+
+
+
+</script>
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+

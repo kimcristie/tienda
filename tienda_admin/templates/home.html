@@ -1,0 +1,534 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+
+<div style="background-color: #ececec">
+	<h2>  Cadastro de Venda Diário</h2>
+<hr>
+	<div>
+	  <form class="form-inline" method="POST">
+
+			{% csrf_token %}
+			<div class="col-md-12 table-responsive">
+		
+				<table class=" table table-bordered table-hover table-sortable">
+					<thead style="background-color: #fff">
+						<tr>
+							<th> <!--class="text-center"  style="color: #f4511e" -->
+								Data
+							</th>
+							<th >
+								Expositor
+							</th>
+							<th>
+								QTD
+							</th>
+							<th>
+								Produto
+							</th>
+							<th>
+								OBS
+							</th>
+							<th >
+								Cor
+							</th>
+							<th >
+								É troca?
+							</th>
+							<th >
+								Preço un.
+							</th>
+							<th >
+								Pagamento
+							</th>
+							<th style="border: none;">
+							
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>
+							<input id="data_datepicker" type = 'date' name='create_date' value="" >
+						</td>
+						<td>
+							<select id="id_selected-dropdown-expositor" name="selected-dropdown-expositor" class="js-example-basic-single">
+								<!-- <option id="id_default-option-owners_new" style="display:none" disabled selected value ></option> -->
+								{% for expositor in expositores %} 
+								 <option value="{{ expositor.store_name }}" name="chosen_new_owner">{{ expositor.store_name }}</option>
+								{% endfor %}
+							</select>
+						</td>
+
+						<td>
+							<p name="qtd"> 
+								{{ form.qtd }}
+
+								{% if form.qtd.help_text %}
+								  </br><small style="color: grey">{{ form.qtd.help_text|safe }}</small>
+								{% endif %}
+								{% for error in form.qtd.errors %}
+								  </br><p style="color: red">{{ error }}</p>
+								{% endfor %}
+							</p>
+						</td>
+						<td>
+							<select id="id_selected-dropdown-product" name="selected-dropdown-product" class="js-example-basic-single">
+								<!-- <option id="id_default-option-owners_new" style="display:none" disabled selected value ></option> -->
+								{% for product in products %} 
+								 <option value="{{ product.name }}" name="chosen_new_owner">{{ product.name }}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td>
+							<p name="obs"> 
+								{{ form.obs }}
+
+								{% if form.obs.help_text %}
+								  </br><small style="color: grey">{{ form.obs.help_text|safe }}</small>
+								{% endif %}
+								{% for error in form.obs.errors %}
+								  </br><p style="color: red">{{ error }}</p>
+								{% endfor %}
+							</p>
+						</td>
+
+						<td>
+							<select id="id_selected-dropdown-product-colour" name="selected-dropdown-product-colour" class="js-example-basic-single">
+								<option id="id_default-option-owners_new" style="display:none" disabled selected value ></option>
+								{% for product_colour in product_colours %} 
+								 <option value="{{ product_colour.colour }}" name="chosen_new_owner">{{ product_colour.colour }}</option>
+								{% endfor %}
+							</select>
+						</td>
+
+						<td>
+							<p name="is_troca"> 
+								{{ form.is_troca }}
+
+								{% if form.is_troca.help_text %}
+								  </br><small style="color: grey">{{ form.is_troca.help_text|safe }}</small>
+								{% endif %}
+								{% for error in form.is_troca.errors %}
+								  </br><p style="color: red">{{ error }}</p>
+								{% endfor %}
+							</p>
+						</td>
+
+						<td>
+							<p name="un_price"> 
+								{{ form.un_price }}
+
+								{% if form.un_price.help_text %}
+								  </br><small style="color: grey">{{ form.un_price.help_text|safe }}</small>
+								{% endif %}
+								{% for error in form.un_price.errors %}
+								  </br><p style="color: red">{{ error }}</p>
+								{% endfor %}
+							</p>
+						</td>
+						<td>
+							<select id="id_selected-dropdown-payment" name="selected-dropdown-payment" class="js-example-basic-single">
+								<!--<option id="id_default-option-owners_new" style="display:none" disabled selected value ></option> -->
+								{% for payment_type in payment_types %} 
+								 <option value="{{ payment_type.name }}" name="chosen_new_owner">{{ payment_type.name }}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td style="border: none;">
+								<button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_create_input">Criar</button>
+						</td>
+
+			</tr>
+			</tbody>
+
+	</table>
+	</div>
+
+</form>
+</div>
+<hr style="border-color: #f4511e">
+</div>
+
+
+</div><br><br><br>
+
+
+
+
+<!-- #######################################################################################################################-->
+
+
+
+{% if inputs_diario %}
+<h3>Entradas do dia</h3>
+<div>    
+  <table class="table table-striped">
+	<thead>
+	  <tr>
+		<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+		<th>Data</th>
+		<th>Expositor</th>
+		<th>Quantidade</th>
+		<th>Produto</th>
+		<th>Observação</th>
+		<th>Cor</th>
+		<th>É troca?</th>
+		<th>Preço (un)</th>
+		<th>Tipo Pagamento</th>
+		<th>Preço Total</th>
+		<th>Usuário</th>
+	  </tr>
+	</thead>
+	<tbody id="id_table">
+	{% for inputs in inputs_diario %}
+	  <tr>
+		<td name="" value=""> 
+			<button class="btn class_editInput" data-toggle="modal_editInput" data-id="{{ inputs.id }}" data-create_date="{{ inputs.create_date | date:'Y-m-d' }}" data-customer="{{ inputs.customer.store_name }}" data-qtd="{{ inputs.qtd }}" data-product_type="{{ inputs.product_type.name }}" data-obs="{{ inputs.obs }}" data-product_colour="{{ inputs.product_colour.colour }}" data-is_troca="{{ inputs.is_troca }}" data-un_price="{{ inputs.un_price }}" data-payment_type="{{ inputs.payment_type.name }}" name="{{ inputs.id }}" value="{{ inputs.id }}" type="button">Editar</button> 
+		</td>
+		<td name="{{ inputs.create_date }}">{{ inputs.create_date }}</td>
+		<td name="{{ inputs.customer.store_name }}">{{ inputs.customer.store_name }}</td>
+		<td name="{{ inputs.qtd }}">{{ inputs.qtd }}</td>
+		<td name="{{ inputs.product_type.name }}">{{ inputs.product_type.name }}</td>
+		<td name="{{ inputs.obs }}">{{ inputs.obs }}</td>
+		<td name="{{ inputs.product_colour.colour }}">{{ inputs.product_colour.colour }}</td>
+		<td name="{{ inputs.is_troca }}">{{ inputs.is_troca | yesno:"Sim,Não" }}</td>
+		<td name="{{ inputs.un_price }}">{{ inputs.un_price }}</td>
+		<td name="{{ inputs.payment_type.name }}">{{ inputs.payment_type.name }}</td>
+		<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
+		<td name="{{ inputs.updated_by.username }}">{{ inputs.updated_by.username }}</td>
+	  </tr>
+	{% endfor %}
+	</tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- #######################################################################################################################-->
+
+<!-- //////////// /////////////// MODAL EDITAR/ //////////////////////////// -->
+
+
+<!-- Modal -->
+  <div class="modal fade" id="modal_editInput" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Usuário</h4>
+        </div>
+
+        <div class="modal-body">
+
+			<form class="form-horizontal" method="POST">
+			{% csrf_token %}
+		    <fieldset>
+		        <div class="control-group">
+		            <label class="control-label" for="modal_edit_date">Data</label>
+		            <div class="controls">
+						<input id="modal_edit_date" type = 'date' name='modal_edit_date'>
+						<input id="modal_edit_id" name="modal_edit_id" type="hidden" name="modal_edit_id"/>
+		            </div>
+		        </div>
+				<br>
+
+				<div class="control-group">
+					<label class="control-label" for="modal_edit_expositor">Expositor</label>
+					<div class="dropdown">
+					<select id="modal_edit_expositor" name="modal_edit_expositor">
+						<option id="id_default-option-expositor" style="display:none" disabled selected value ></option>
+							{% for expositor in expositores %} 
+							 <option value="{{ expositor.store_name }}" name="chosen_edit_expositor">{{ expositor.store_name }}</option>
+							{% endfor %}
+					</select>
+					</div>
+				<input id="modal_edit_expositor_hidden" name="modal_edit_expositor_hidden" type="hidden">
+				</div>
+				<br>
+
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_qtd">Quantidade</label>
+		            <div class="controls">
+		                <input type="number" class="input-xlarge" id="modal_edit_qtd" name="modal_edit_qtd" style="width:80px;" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+
+				<div class="control-group">
+					<label class="control-label" for="modal_edit_product">Produto</label>
+					<div class="dropdown">
+					<select id="modal_edit_product" name="modal_edit_product">
+						<option id="id_default-option-product" style="display:none" disabled selected value ></option>
+							{% for product in products %} 
+						 	<option value="{{ product.name }}" name="chosen_edit_product">{{ product.name }}</option>
+							{% endfor %}
+					</select>
+					</div>
+				<input id="modal_edit_product_hidden" name="modal_edit_product_hidden" type="hidden">
+				</div>
+				<br>
+
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_obs">Observação</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_obs" name="modal_edit_obs" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+
+				<div class="control-group">
+					<label class="control-label" for="modal_edit_colour">Cor</label>
+					<div class="dropdown">
+					<select id="modal_edit_colour" name="modal_edit_colour">
+						<option id="id_default-option-colour" style="display:none" disabled selected value ></option>
+							{% for product_colour in product_colours %} 
+							<option value="{{ product_colour.colour }}" name="chosen_new_colour">{{ product_colour.colour }}</option>
+							{% endfor %}
+					</select>
+					</div>
+				<input id="modal_edit_colour_hidden" name="modal_edit_colour_hidden" type="hidden">
+				</div>
+				<br>
+
+
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_troca">É troca?</label>
+		            <div class="controls">
+		                <input type="checkbox"  class="input-xlarge" id="modal_edit_troca" name="modal_edit_troca">
+						<p class="help-block"></p>
+		            </div>
+		        </div>
+
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_price_un">Preço Unitário</label>
+		            <div class="controls"> 
+		                <input class="input-xlarge" id="modal_edit_price_un" name="modal_edit_price_un" style="width:80px;" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+				<br>
+
+				<div class="control-group">
+					<label class="control-label" for="modal_edit_payment_type">Tipo de Pagamento</label>
+					<div id="dropdown-owners" class="dropdown">
+					<select id="modal_edit_payment_type" name="modal_edit_payment_type">
+						<option id="id_default-option-payment_type" style="display:none" disabled selected value ></option>
+							{% for payment_type in payment_types %} 
+							 <option value="{{ payment_type.name }}" name="chosen_edit_payment_type">{{ payment_type.name }}</option>
+							{% endfor %}
+					</select>
+					</div>
+				<input id="modal_edit_payment_hidden" name="modal_edit_payment_hidden" type="hidden">
+				</div>
+				<br>
+
+		        <div class="control-group">
+		            <div class="controls">
+		                <input type="submit" class="btn btn-primary" name="btn_edit_input" id="btn_edit_input" value="Editar" />
+		                <input type="button" class="btn btn_cancel_modal" value="Cancel" />
+		            </div>
+		        </div>
+		    </fieldset>
+			</form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+
+<!-- #######################################################################################################################-->
+
+
+
+{% else %}
+  
+
+<br><br><br>
+  <main class="container d-flex h-100">
+    <div class="container row justify-content-center align-self-center" style="top:20px;">
+  <h2></h2>
+  <p></p>
+	
+  	<div class="card">
+		<form method="post">
+		<div class="card-header"></div>
+		<div class="card-body">
+			<p>Você não está logado</p>
+  			<a href="{% url 'login' %}">clique para login</a>
+		</div> 
+		
+		</form>
+	  </div>
+	  <br>
+	</div> 
+  </main>
+
+
+
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+table.table-bordered > thead > tr > th{
+  border:0px solid  #9c9c9c ;
+}
+
+/** BORDAS GRADIENTE	 CINZA PRA BANCO FICA COMO BOTAO KK **/
+table.table-bordered > thead{
+  background-image: linear-gradient(to bottom, #9c9c9c 0%, white 100%); /* the gradient */
+  background-origin: border-box; /* set background to start from border-box */
+  border-spacing: 5px; /* space between each cell */
+  border: 5px solid transparent; /* optional */
+
+}
+
+
+table.table-bordered > tbody > tr > td{
+  border:0px solid  #9c9c9c ;
+}
+
+
+</style>
+
+<script>
+
+$(document).ready(function(){
+
+	// In your Javascript (external .js resource or <script> tag) MUITO IMPORTANTE FAZ O DROPDOWN DAR PRA FAZER AUTOCOMPLETE
+    $('.js-example-basic-single').select2();
+
+    /////////////////////////////////
+
+	////////////////////////////////////para incluir no datepicker a data de sempre
+	var today = new Date();
+	var dd = ("0" + (today.getDate())).slice(-2);
+	var mm = ("0" + (today.getMonth() +　1)).slice(-2);
+	var yyyy = today.getFullYear();
+	today = yyyy + '-' + mm + '-' + dd ;
+	$("#data_datepicker").attr("value", today);
+	///////////////////////////////////////////////////////////////
+
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+	///////////// modal edit
+	$(".class_editInput").click(function(){
+
+
+//create_date data-id="{{ inputs.id }}" data-customer="{{ inputs.customer.store_name }}" data-qtd="{{ inputs.qtd }}" data-product_type="{{ inputs.product_type.name }}" data-obs="{{ inputs.obs }}" data-product_colour="{{ inputs.product_colour.colour }}" data-is_troca="{{ inputs.is_troca }}" data-un_price="{{ inputs.un_price }}" data-payment_type="{{ inputs.payment_type.name }}"
+
+		 $("#modal_edit_date").val($(this).data('create_date')); // OLHA NO DATA TOGGLE COMO PASSA A DATA PRA CA
+		 $("#modal_edit_qtd").val($(this).data('qtd'));
+		 $("#modal_edit_obs").val($(this).data('obs'));
+		 $("#modal_edit_troca").val($(this).data('is_troca'));
+		 $("#modal_edit_price_un").val($(this).data('un_price'));
+
+
+		 // para modal-edit-expositor
+		 $("#modal_edit_expositor_hidden").val($(this).data('customer'));
+     	 //pra colocar no modal editar o valor atual do payment
+     	 $("#id_default-option-expositor").val($(this).data('customer'));
+     	 $("#id_default-option-expositor").text($(this).data('customer'));
+	 	 $("#modal_edit_expositor option[value='id_default-option-expositor']").prop('selected', true);
+    	 // you need to specify id of combo to set right combo, if more than one combo
+		 //para copiar o valor do select dropdown pro input pra que na view, pegue o valor do input só
+		 $("#modal_edit_expositor").on("change", function () {    //when selected value changed
+		 	$("#modal_edit_expositor_hidden").val($(this).val());  //change value in textbox input inside the span cause I cant access the input form
+		 });
+
+		 // para modal-edit-product
+		 $("#modal_edit_product_hidden").val($(this).data('product_type'));
+     	 //pra colocar no modal editar o valor atual do payment
+     	 $("#id_default-option-product").val($(this).data('product_type'));
+     	 $("#id_default-option-product").text($(this).data('product_type'));
+	 	 $("#modal_edit_product option[value='id_default-option-product']").prop('selected', true);
+    	 // you need to specify id of combo to set right combo, if more than one combo
+		 //para copiar o valor do select dropdown pro input pra que na view, pegue o valor do input só
+		 $("#modal_edit_product").on("change", function () {    //when selected value changed
+		 	$("#modal_edit_product_hidden").val($(this).val());  //change value in textbox input inside the span cause I cant access the input form
+		 });
+
+		 // para modal-edit-colour
+		 $("#modal_edit_colour_hidden").val($(this).data('product_colour'));
+     	 //pra colocar no modal editar o valor atual do payment
+     	 $("#id_default-option-colour").val($(this).data('product_colour'));
+     	 $("#id_default-option-colour").text($(this).data('product_colour'));
+	 	 $("#modal_edit_colour option[value='id_default-option-colour']").prop('selected', true);
+    	 // you need to specify id of combo to set right combo, if more than one combo
+		 //para copiar o valor do select dropdown pro input pra que na view, pegue o valor do input só
+		 $("#modal_edit_colour").on("change", function () {    //when selected value changed
+		 	$("#modal_edit_colour_hidden").val($(this).val());  //change value in textbox input inside the span cause I cant access the input form
+		 });
+
+
+		 /// para tratar payment type
+		 //esse eh para que se nao mudar o valor, o valor atual seja o que vai ser guardado
+		 $("#modal_edit_payment_hidden").val($(this).data('payment_type'));
+     	 //pra colocar no modal editar o valor atual do payment
+     	 $("#id_default-option-payment_type").val($(this).data('payment_type'));
+     	 $("#id_default-option-payment_type").text($(this).data('payment_type'));
+	 	 $("#modal_edit_payment_type option[value='id_default-option-payment_type']").prop('selected', true);
+    	 // you need to specify id of combo to set right combo, if more than one combo
+		 //para copiar o valor do select dropdown pro input pra que na view, pegue o valor do input só
+		 $("#modal_edit_payment_type").on("change", function () {    //when selected value changed
+		 	$("#modal_edit_payment_hidden").val($(this).val());  //change value in textbox input inside the span cause I cant access the input form
+		 });
+
+
+
+		 value_troca = $(this).data('is_troca');
+		 if(value_troca == "True"){
+		     $('#modal_edit_troca').attr('checked', true);
+		 }else{
+		     $('#modal_edit_troca').attr('checked', false);
+		 };
+		 
+		 $("#modal_edit_id").val($(this).data('id'));
+
+		 $('#modal_editInput').modal('show');
+	   });
+
+
+		
+		// Hide the Modals
+		$(".btn_cancel_modal").click(function(){
+		    $("#modal_editInput").modal("hide");
+	});
+	//////////////////////////////////////////////////
+
+
+
+
+
+});
+
+
+</script>
+
+
+
+
+{% endblock %}

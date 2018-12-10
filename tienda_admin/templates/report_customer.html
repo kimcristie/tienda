@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="background-color: #ececec">
+
+	  <form class="form-inline" method="POST">
+
+			{% csrf_token %}
+			<div class="col-sm-12 table-responsive">
+		
+				<table class="table">
+					<thead>
+						<tr><th><h2>  Relatório Mensal por Expositor</h2><small style="color: grey">relatório por período com totais por expositor(dono) escolhido</small></tr></th>
+					</thead>
+					<tbody>
+					<tr class="col-sm-12 table-responsive">
+						<td>
+							<label>Data Inicio: </label>
+							<input id="data_datepicker_inicio" type = 'date' name='input_date_inicio' value="" required>
+						</td>
+						<td>
+							<label>Data Final: </label>
+							<input id="data_datepicker_final" type = 'date' name='input_date_final' value="" required>
+						</td>
+						<td>
+							<label>Expositor (dono): </label>
+							<select id="id_select_dropdown_list_customer" name="select_dropdown_list_customer" class="js-example-basic-single">
+								<!--<option id="id_default-option-owners_new" style="display:none" disabled selected value >Todos</option>-->
+								{% for expositor in expositores %} 
+								 <option value="{{ expositor.owner }}" name="chosen_new_owner">{{ expositor.owner }}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td>
+							<br>
+							<button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_create_report">Visualizar</button>	
+						</td>
+						{% if inputs_diarios %}
+						<td> 
+						 <br>
+						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_customer&date_input_inicio={{ date_input_inicio }}&date_input_final={{ date_input_final }}&filename_name=relatorio_mensal_{{ owner_name }}&owner_name={{ owner_name }}&sheet_name=Vendas&total_cartoes={{total_cartoes|floatformat:2 }}&total_dinheiro={{ total_dinheiro|floatformat:2 }}&total_maq_loja={{ total_maq_loja|floatformat:2 }}&valor_total={{ valor_total|floatformat:2 }}&comissao_tienda={{ comissao_tienda|floatformat:2 }}&taxa_maquina_da_loja={{ taxa_maquina_da_loja|floatformat:2  }}&valor_aluguel={{ valor_aluguel }}&texto_valor_a_pagar={{ texto_valor_a_pagar }}&valor_a_pagar={{ valor_a_pagar |floatformat:2 }}&total_vendas_Tienda={{ total_vendas_Tienda |floatformat:2 }}&total_vendas_Tienda_brecho={{ total_vendas_Tienda_brecho |floatformat:2 }}&total_vendas_Katifa={{ total_vendas_Katifa |floatformat:2 }}&total_vendas_Tienda_Katifa={{ total_vendas_Tienda_Katifa |floatformat:2 }}&obj_html=<table>{% for inputs in inputs_diarios %}<tr><td>{{ inputs.create_date }}</td><td>{{ inputs.customer.store_name }}</td><td>{{ inputs.qtd }}</td><td>{{ inputs.product_type.name }}</td><td>{{ inputs.obs }}</td><td>{{ inputs.product_colour.colour }}</td><td>{{ inputs.is_troca | yesno:'Sim,Não' }}</td><td>{{ inputs.un_price }}</td><td>{{ inputs.payment_type.name }}</td>{% ifequal owner_name 'Katifa'  %}<td>{{ inputs.product_colour.colour_price }}</td>{% endifequal %}<td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>">Exportar</a>
+						</td>
+					{% endif %}
+					</tr>
+				</tbody>
+
+				</table>
+
+
+
+
+
+
+
+
+
+</form>
+</div>
+<hr style="border-color: #f4511e">
+</div>
+</div><br>
+
+<!-- ############################################################################################################ -->
+
+
+{% if inputs_diarios %}
+<h3>Resultado para {{ owner_name }}</h3>
+<div>    
+  <table class="table table-striped">
+	<thead>
+		<hr>
+		<input id="searchInput" type="text" placeholder="Pesquisar..">
+	  <tr>
+		<th>Data</th>
+		<th>Expositor</th>
+		<th>Quantidade</th>
+		<th>Produto</th>
+		<th>Observação</th>
+		<th>Cor</th>
+		<th>É troca?</th>
+		<th>Preço (un)</th>
+		<th>Tipo Pagamento</th>
+        {% ifequal owner_name 'Katifa'  %}
+		<th>Preço Cor</th>
+        {% endifequal %}
+		<th>Preço Total</th>
+	  </tr>
+	</thead>
+	<tbody id="id_table">
+	{% for inputs in inputs_diarios %}
+	  <tr>
+		<td name="{{ inputs.create_date }}">{{ inputs.create_date }}</td>
+		<td name="{{ inputs.customer.store_name }}">{{ inputs.customer.store_name }}</td>
+		<td name="{{ inputs.qtd }}">{{ inputs.qtd }}</td>
+		<td name="{{ inputs.product_type.name }}">{{ inputs.product_type.name }}</td>
+		<td name="{{ inputs.obs }}">{{ inputs.obs }}</td>
+		<td name="{{ inputs.product_colour.colour }}">{{ inputs.product_colour.colour }}</td>
+		<td name="{{ inputs.is_troca }}">{{ inputs.is_troca | yesno:"Sim,Não"}}</td>
+		<td name="{{ inputs.un_price }}">{{ inputs.un_price }}</td>
+		<td name="{{ inputs.payment_type.name }}">{{ inputs.payment_type.name }}</td>
+        {% ifequal owner_name 'Katifa'  %}
+		<td name="{{ inputs.product_colour.colour_price }}">{{ inputs.product_colour.colour_price }}</td>
+        {% endifequal %}
+		<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
+	  </tr>
+	{% endfor %}
+		{% if owner_name != 'Tienda' and owner_name != 'Katifa' %}
+		<tr>
+			<td><b>Total Cartões</b></td>
+			<td>{{ total_cartoes|floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Total dinheiro</b></td>
+			<td>{{ total_dinheiro|floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Total Máquina da Loja</b></td>
+			<td>{{ total_maq_loja|floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Total</b></td>
+			<td>{{ valor_total|floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Comissão Tienda</b></td>
+			<td>{{ comissao_tienda|floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Comissão Máquina da Loja</b></td>
+			<td>{{ taxa_maquina_da_loja|floatformat:2  }}</td>
+		</tr>
+		<tr>
+			<td><b>Aluguel</b></td>
+			<td>{{ valor_aluguel }}</td>
+		</tr>
+		<tr>
+			<td><b>{{ texto_valor_a_pagar }}</b></td>
+			<td>{{ valor_a_pagar |floatformat:2 }}</td>
+		</tr>
+		{% endif %}
+
+
+		{% ifequal owner_name 'Tienda'  %}
+		<tr>
+			<td><b>Total Tienda:</b></td>
+			<td>{{ total_vendas_Tienda |floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Total Tienda Brechó:</b></td>
+			<td>{{ total_vendas_Tienda_brecho |floatformat:2 }}</td>
+		</tr>
+		{% endifequal %}
+
+		{% ifequal owner_name 'Katifa'  %}
+		<tr>
+			<td><b>Total Katifa (cores):</b></td>
+			<td>{{ total_vendas_Katifa |floatformat:2 }}</td>
+		</tr>
+		<tr>
+			<td><b>Total Tienda:</b></td>
+			<td>{{ total_vendas_Tienda_Katifa |floatformat:2 }}</td>
+		</tr>
+		{% endifequal %}
+
+
+
+	</tbody>
+  </table>
+
+</div>
+
+
+{% endif %}
+
+<!-- #######################################################################################################################-->
+
+
+
+<style>
+#id-link-btn-xls:link, #id-link-btn-xls:visited {
+  background-color: #47C758;
+  color: white;
+  padding: 3px 11px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+
+#id-link-btn-xls:hover, #id-link-btn-xls:active {
+  background-color: green;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+	// In your Javascript (external .js resource or <script> tag) MUITO IMPORTANTE FAZ O DROPDOWN DAR PRA FAZER AUTOCOMPLETE
+    $('.js-example-basic-single').select2();
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+	
+
+
+});
+
+
+
+</script>
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+

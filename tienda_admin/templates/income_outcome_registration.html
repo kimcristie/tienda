@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div style="background-color: #ececec">
+	<form class="form-inline" method="POST">
+		{% csrf_token %}
+		<table class="table-topo block logo ">
+			<colgroup>
+				<col style="width:50%"/>
+				<col style="width:50%"/>
+			</colgroup>
+			<tr>
+				<td>
+					<h2>Cadastro de Entradas e Saídas</h2>
+					<button class="btn btn-primary id_newUser" data-toggle="modal_new" type="button">Novo</button>
+				</td>
+				<td>
+				    <table class="id-table-menu-top">
+				        <tr>
+				            <td>
+								<label>Data Início</label> <input id="data_datepicker" type = 'date' name='input_date_begin' value="">
+							</td>
+							<td>
+								<label>Data Fim</label> <input id="data_datepicker" type = 'date' name='input_date_end' value="">
+							</td>
+							<td>
+								<br><button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_search_dates">Visualizar</button>	
+							</td>
+				        </tr>
+				    </table>
+				</td>
+			</tr>
+		</table>
+	</form>
+<hr style="border-color: #f4511e">
+</div>
+<br>
+
+<!-- ############################################################################################################ -->
+
+
+
+{% if income_outcomes_range_date %}
+
+	<div class="container">  
+	
+	
+	<h3>Cadastros no intervalo de datas de {% for start_dat in start_date %}{{ start_dat }}{% endfor %} à {% for end_dat in end_date %}{{ end_dat }}{% endfor %} informado</h3>  
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+			<th>Data</th>
+            <th>Descrição</th>
+			<th>Valor</th>
+            <th>É Entrada?</th>
+            <th>É Saída?</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for income_outcome in income_outcomes_range_date %}
+		  <tr>
+			<td name="" value=""> <button class="btn id_editUser" data-id="{{ income_outcome.id }}" data-toggle="modal_edit" data-create-date="{{income_outcome.create_date | date:'Y-m-d'}}" data-description="{{ income_outcome.description }}" data-income-value="{{ income_outcome.value }}" data-is-income="{{ income_outcome.is_income }}" data-is-outcome="{{ income_outcome.is_outcome }}" value="{{ income_outcome.id }}" type="button">Editar</button> </td>
+			<td name="{{ income_outcome.create_date }}">{{ income_outcome.create_date }}</td>
+			<td name="{{ income_outcome.description }}">{{ income_outcome.description }}</td>
+            <td name="{{ income_outcome.value }}">{{ income_outcome.value }}</td>
+			<td name="{{ income_outcome.is_income }}">{{ income_outcome.is_income | yesno:"Sim,Não" }}</td>
+			<td name="{{ income_outcome.is_outcome }}">{{ income_outcome.is_outcome | yesno:"Sim,Não" }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div>
+{% endif %}
+
+
+<!-- ############################################################################################################ -->
+
+
+{% if not income_outcomes_range_date %}
+{% if income_outcomes %}
+
+	<div class="container">    
+	<h3>Cadastros no dia de hoje</h3>  
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+			<th>Data</th>
+            <th>Descrição</th>
+			<th>Valor</th>
+            <th>É Entrada?</th>
+            <th>É Saída?</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for income_outcome in income_outcomes %}
+		  <tr>
+			<td name="" value=""> <button class="btn id_editUser" data-toggle="modal_edit" data-id="{{ income_outcome.id }}" data-toggle="modal_edit" data-create-date="{{income_outcome.create_date | date:'Y-m-d'}}" data-description="{{ income_outcome.description }}" data-income-value="{{ income_outcome.value }}" data-is-income="{{ income_outcome.is_income }}" data-is-outcome="{{ income_outcome.is_outcome }}" value="{{ income_outcome.id }}" type="button">Editar</button> </td>
+			<td name="{{ income_outcome.create_date }}">{{ income_outcome.create_date }}</td>
+			<td name="{{ income_outcome.description }}">{{ income_outcome.description }}</td>
+            <td name="{{ income_outcome.value }}">{{ income_outcome.value }}</td>
+			<td name="{{ income_outcome.is_income }}">{{ income_outcome.is_income }}</td>
+			<td name="{{ income_outcome.is_outcome }}">{{ income_outcome.is_outcome }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div>
+{% endif %}
+{% endif %}
+
+<!-- ############################################################################################################ -->
+
+
+
+<!-- Modal novo expositor-->
+
+
+<div class="modal fade" id="modal_new" role="dialog">
+	<div class="modal-dialog">
+	  <!-- Modal content-->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h4 class="modal-title">Novo Cadastro</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" method="POST">
+				{% csrf_token %}
+
+				<label>Data:</label><br>
+				<input id="data_datepicker" type = 'date' name='create_date' value="" >
+				<br><br>
+
+				<p> 
+					{{ form.description.label_tag }} <br>
+					{{ form.description }}
+
+					{% if form.description.help_text %}
+					  </br><small style="color: grey">{{ form.description.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.description.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+
+				<p> 
+					{{ form.value.label_tag }} <br>
+					{{ form.value }}
+
+					{% if form.value.help_text %}
+					  </br><small style="color: grey">{{ form.value.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.value.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+
+				<p> 
+					{{ form.is_income.label_tag }} <br>
+					{{ form.is_income }}
+
+					{% if form.is_income.help_text %}
+					  </br><small style="color: grey">{{ form.is_income.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.is_income.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+
+				<p> 
+					{{ form.is_outcome.label_tag }} <br>
+					{{ form.is_outcome }}
+
+					{% if form.is_outcome.help_text %}
+					  </br><small style="color: grey">{{ form.is_outcome.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.is_outcome.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+
+
+				<button class="btn btn-info" type="submit" name="btn_new">Criar</button>
+				<input type="button" class="btn btn_cancel_modal" value="Cancel" />
+			</form>
+		</div>
+	  </div>
+	</div>
+</div>	
+
+
+
+<!-- Modal -->
+  <div class="modal fade" id="modal_edit" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Entrada/Saída</h4>
+        </div>
+
+        <div class="modal-body">
+			<form class="form-horizontal" method="POST">
+			{% csrf_token %}
+		    <fieldset>
+		        <div class="control-group">
+		            <label class="control-label" for="modal_edit_create-date">Data</label>
+		            <div class="controls">
+						<input id="modal_edit_create-date" type = 'date' name='modal_edit_create-date'>
+						<input id="modal_edit_id" name="modal_edit_id" type="hidden" name="modal_edit_id"/>
+		            </div>
+		        </div>
+				<br>
+                <div class="control-group">
+		            <label class="control-label" for="modal_edit_description">Descrição</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_description" name="modal_edit_description" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_income-value">Valor</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_income-value" name="modal_edit_income-value" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_is-income">Entrada</label>
+		            <div class="controls">
+		                <input type="checkbox"  class="input-xlarge" id="modal_edit_is-income" name="modal_edit_is-income">
+						<p class="help-block"></p>
+		            </div>
+		        </div>
+
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_is-outcome">Saída</label>
+		            <div class="controls">
+		                <input type="checkbox"  class="input-xlarge" id="modal_edit_is-outcome" name="modal_edit_is-outcome">
+						<p class="help-block"></p>
+		            </div>
+		        </div>
+
+		        <div class="control-group">
+		            <div class="controls">
+		                <input type="submit" class="btn btn-primary" name="btn_edit" value="Editar" />
+		                <input type="button" class="btn btn_cancel_modal" value="Cancel" />
+		            </div>
+		        </div>
+		    </fieldset>
+			</form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+<style>
+table.table-topo {
+    width: 100%;
+}
+
+table.id-table-menu-top {
+    width: auto;
+    margin-right: 0px;
+    margin-left: auto;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+    // Show the Modal edit user
+	//$("#id_editUser").click(function(){
+	//    $("#modal_edit").modal("show");
+    //});
+
+   $(".id_newUser").click(function(){
+     $('#modal_new').modal('show');
+   });
+
+   $(".id_editUser").click(function(){
+     $('#modal_edit').modal('show');
+
+     $("#modal_edit_id").val($(this).data('id'));
+     $("#modal_edit_create-date").val($(this).data('create-date')); //OLHAR NO DATA TOGGLE COMO PASSAR A DATA ATUAL PRO EDIT
+     $("#modal_edit_description").val($(this).data('description'));
+     $("#modal_edit_income-value").val($(this).data('income-value'));
+
+     is_income = $(this).data('is-income');
+	 if(is_income == "True"){
+          $('#modal_edit_is-income').attr('checked', true);
+     }else{
+          $('#modal_edit_is-income').attr('checked', false);
+     };
+
+     is_outcome = $(this).data('is-outcome');
+	 if(is_outcome == "True"){
+          $('#modal_edit_is-outcome').attr('checked', true);
+     }else{
+          $('#modal_edit_is-outcome').attr('checked', false);
+     };
+
+
+	 
+   });
+
+    // Hide the Modals
+	$(".btn_cancel_modal").click(function(){
+        $("#modal_edit").modal("hide");
+    });
+	
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+});
+
+</script>
+
+
+
+
+{% endblock %}

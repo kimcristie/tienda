@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<div class="container">
+		<br>
+		  <h2>Cadastro de Usuário</h2>
+		<button class="btn btn-primary id_newUser" data-toggle="modal_newUser" type="button">Novo</button>
+	</div><br>
+
+	<div class="container">    
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+			<th>Usuario</th>
+			<th>Email</th>
+			<th>Ativo</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for usuario in usuarios %}
+		  <tr>
+			<td name="" value=""> <button class="btn id_editUser" data-toggle="modal_editUser" data-id="{{ usuario.id }}" data-username="{{ usuario.username }}" data-password="{{ usuario.password }}" data-email="{{ usuario.email }}" data-ativo="{{ usuario.is_active }}" name="{{ usuario.id }}" value="{{ usuario.id }}" type="button">Editar</button> </td>
+			<td name="{{ usuario.username }}">{{ usuario.username }}</td>
+			<td name="{{ usuario.email }}">{{ usuario.email }}</td>
+			<td name="{{ usuario.is_active }}">{{ usuario.is_active | yesno:"Sim,Não" }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div>
+
+
+
+<!-- Modal novo usuario-->
+
+
+<div class="modal fade" id="modal_newUser" role="dialog">
+	<div class="modal-dialog">
+	  <!-- Modal content-->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h4 class="modal-title">Novo Usuário</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" method="POST">
+				{% csrf_token %}
+				{% for field in form %}
+				  <p>
+					{{ field.label_tag }}<br>
+					{{ field }}
+					
+					{% if field.help_text %}
+					  </br><small style="color: grey">{{ field.help_text|safe }}</small>
+					{% endif %}
+					{% for error in field.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				  </p>
+				{% endfor %}
+				<button class="btn btn-info" type="submit" name="btn_signup">Criar</button>
+			</form>
+		</div>
+	  </div>
+	</div>
+</div>	
+
+
+
+
+
+<!--
+<div class="container"> 
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}<br>
+        {{ field }}
+        {% if field.help_text %}
+          <small style="color: grey">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <p style="color: red">{{ error }}</p>
+        {% endfor %}
+      </p>
+    {% endfor %}
+    <button class="btn btn-info" type="submit" name="btn_signup">Sign up</button>
+  </form>
+</div> 
+-->
+
+<!-- Modal -->
+  <div class="modal fade" id="modal_editUser" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Usuário</h4>
+        </div>
+
+        <div class="modal-body">
+
+			<form class="form-horizontal" method="POST"> <!--  commandName="announceBean" action="/announce"  -->
+			{% csrf_token %}
+		    <fieldset>
+		        <div class="control-group">
+		            <label class="control-label" for="modal_edit_username">Usuário</label>
+		            <div class="controls">
+		                <input id="modal_edit_username" name="modal_edit_username" class="input-xlarge disabled" type="text" type="text"/>
+						<input id="modal_edit_id" name="modal_edit_id" type="hidden" name="modal_edit_id"/>
+		            </div>
+		        </div>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_email">E-mail</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_email" name="modal_edit_email" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_active">Ativo?</label>
+		            <div class="controls">
+		                <input type="checkbox"  class="input-xlarge" id="modal_edit_active" name="modal_edit_active">
+						<p class="help-block"></p>
+		            </div>
+		        </div>
+
+		        <div class="control-group">
+		            <div class="controls">
+		                <input type="submit" class="btn btn-primary" name="btn_edit_user" value="Editar" />
+		                <input type="button" class="btn btn_cancel_modal" value="Cancel" />
+		            </div>
+		        </div>
+		    </fieldset>
+			</form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+
+
+
+<script>
+
+$(document).ready(function(){
+    // Show the Modal edit user
+	//$("#id_editUser").click(function(){
+	//    $("#modal_editUser").modal("show");
+    //});
+
+   $(".id_newUser").click(function(){
+     $('#modal_newUser').modal('show');
+   });
+
+   $(".id_editUser").click(function(){
+     $("#modal_edit_username").val($(this).data('username'));
+     $("#modal_edit_email").val($(this).data('email'));
+	 value_active = $(this).data('ativo');
+     if(value_active == "True"){
+         $('#modal_edit_active').attr('checked', true);
+     }else{
+         $('#modal_edit_active').attr('checked', false);
+     };
+	 
+     $("#modal_edit_id").val($(this).data('id'));
+
+     $('#modal_editUser').modal('show');
+   });
+
+
+    
+    // Hide the Modals
+	$(".btn_cancel_modal").click(function(){
+        $("#modal_editUser").modal("hide");
+    });
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  	});
+
+
+});
+</script>
+
+
+
+
+{% endblock %}

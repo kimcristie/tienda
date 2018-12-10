@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="background-color: #ececec">
+
+	  <form class="form-inline" method="POST">
+
+			{% csrf_token %}
+			<div class="col-sm-12 table-responsive">
+		
+				<table class="table">
+					<thead>
+						<tr><th><h2>  Relatório de Venda Diário</h2></tr></th>
+					</thead>
+					<tbody>
+					<tr class="col-sm-12 table-responsive">
+						<td>
+							<label>Data: </label>
+							<input id="data_datepicker" type = 'date' name='input_date' value="" >
+						</td>
+						<td>
+							<label>Expositores:</label>
+							<select multiple="multiple" size="30" style="height: 100%;width: 200px" id="id_select_dropdown_list_customer" name="select_dropdown_list_customer" class="js-example-basic-single">
+								<!--<option id="id_default-option-owners_new" style="display:none" disabled selected value >Todos</option>-->
+								{% for expositor in expositores %} 
+								 <option value="{{ expositor.store_name }}" name="chosen_new_owner">{{ expositor.store_name }}</option>
+								{% endfor %}
+							</select>
+						<br><small style="color: grey">para todos, deixar em branco</small>
+						</td>
+						<td>
+							<label>Produtos: </label>
+							<select multiple="multiple" size="30" style="height: 100%;width: 170px" id="id_select_dropdown_list_products" name="select_dropdown_list_products" class="js-example-basic-single">
+								<!--<option id="id_default-option-owners_new" style="display:none" disabled selected value >Todos</option>-->
+								{% for product in products %} 
+								 <option value="{{ product.name }}" name="chosen_new_owner">{{ product.name }}</option>
+								{% endfor %}
+							</select>
+						<br><small style="color: grey">para todos, deixar em branco</small>
+						</td>
+
+						<td >
+							<br>
+							<button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_create_report">Visualizar</button>	
+						</td>
+						{% if inputs_diarios %}
+						<td>
+						 <br>
+						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_daily&date_input={{ date_input }}&filename_name=venda_diario_&sheet_name=Vendas&obj_html=<table>{% for inputs in inputs_diarios %}<tr><td>{{ inputs.create_date }}</td><td>{{ inputs.customer.store_name }}</td><td>{{ inputs.qtd }}</td><td>{{ inputs.product_type.name }}</td><td>{{ inputs.obs }}</td><td>{{ inputs.product_colour.colour }}</td><td>{{ inputs.is_troca | yesno:'Sim,Não' }}</td><td>{{ inputs.un_price }}</td><td>{{ inputs.payment_type.name }}</td><td>{{ inputs.final_price }}</td><td>{{ inputs.updated_by.username }}</td></tr>{% endfor %}</table>">Exportar</a>
+						</td>
+						{% endif %}
+					</tr>
+				</tbody>
+
+				</table>
+
+</form>
+</div>
+<hr style="border-color: #f4511e">
+</div>
+</div><br>
+
+<!-- ############################################################################################################ -->
+
+
+{% if inputs_diarios %}
+<h3>Resultado</h3>
+<div>    
+  <table class="table table-striped">
+	<thead>
+		<hr>
+		<input id="searchInput" type="text" placeholder="Pesquisar..">
+	  <tr>
+		<th>Data</th>
+		<th>Expositor</th>
+		<th>Quantidade</th>
+		<th>Produto</th>
+		<th>Observação</th>
+		<th>Cor</th>
+		<th>É troca?</th>
+		<th>Preço (un)</th>
+		<th>Tipo Pagamento</th>
+		<th>Preço Total</th>
+		<th>Usuário</th>
+	  </tr>
+	</thead>
+	<tbody id="id_table">
+	{% for inputs in inputs_diarios %}
+	  <tr>
+		<td name="{{ inputs.create_date }}">{{ inputs.create_date }}</td>
+		<td name="{{ inputs.customer.store_name }}">{{ inputs.customer.store_name }}</td>
+		<td name="{{ inputs.qtd }}">{{ inputs.qtd }}</td>
+		<td name="{{ inputs.product_type.name }}">{{ inputs.product_type.name }}</td>
+		<td name="{{ inputs.obs }}">{{ inputs.obs }}</td>
+		<td name="{{ inputs.product_colour.colour }}">{{ inputs.product_colour.colour }}</td>
+		<td name="{{ inputs.is_troca }}">{{ inputs.is_troca | yesno:"Sim,Não"}}</td>
+		<td name="{{ inputs.un_price }}">{{ inputs.un_price }}</td>
+		<td name="{{ inputs.payment_type.name }}">{{ inputs.payment_type.name }}</td>
+		<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
+		<td name="{{ inputs.updated_by.username }}">{{ inputs.updated_by.username }}</td>
+	  </tr>
+	{% endfor %}
+
+
+			
+
+	</tbody>
+  </table>
+
+</div>
+
+
+{% endif %}
+
+<!-- #######################################################################################################################-->
+
+
+
+<style>
+#id-link-btn-xls:link, #id-link-btn-xls:visited {
+  background-color: #47C758;
+  color: white;
+  padding: 3px 11px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+
+#id-link-btn-xls:hover, #id-link-btn-xls:active {
+  background-color: green;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+	// In your Javascript (external .js resource or <script> tag) MUITO IMPORTANTE FAZ O DROPDOWN DAR PRA FAZER AUTOCOMPLETE
+    $('.js-example-basic-single').select2();
+
+	////////////////////////////////////para incluir no datepicker a data de sempre
+	var today = new Date();
+	var dd = ("0" + (today.getDate())).slice(-2);
+	var mm = ("0" + (today.getMonth() +　1)).slice(-2);
+	var yyyy = today.getFullYear();
+	today = yyyy + '-' + mm + '-' + dd ;
+	$("#data_datepicker").attr("value", today);
+	///////////////////////////////////////////////////////////////
+
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+	
+
+
+});
+
+
+
+</script>
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+

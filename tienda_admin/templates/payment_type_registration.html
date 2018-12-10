@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  
+
+	<div class="container">
+		<br>
+		<h2>Cadastro de Tipo de Pagamento</h2>
+		<button class="btn btn-primary id_newPayment" data-toggle="modal_newPayment" type="button">Novo</button>
+		
+	</div><br>
+	{% if pagamentos %}
+	<div class="container">    
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+			<th>Tipo de Pagamento</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for pagamento in pagamentos %}
+		  <tr>
+			<td name="" value=""> 
+				<button class="btn id_editPayment" data-toggle="modal_editPayment" data-id="{{ pagamento.id }}" data-name="{{ pagamento.name }}" name="{{ pagamento.id }}" value="{{ pagamento.id }}" type="button">Editar</button> 
+			</td>
+			<td name="{{ pagamento.name }}">{{ pagamento.name }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div>
+	{% endif %}
+
+
+
+<!-- Modal novo pagamento-->
+<div class="modal fade" id="modal_newPayment" role="dialog">
+	<div class="modal-dialog">
+	  <!-- Modal content-->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h4 class="modal-title">Novo Tipo de Pagamento</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" method="POST">
+				{% csrf_token %}
+				{% for field in form %}
+				  <p>
+					{{ field.label_tag }}<br>
+					{{ field }}
+					
+					{% if field.help_text %}
+					  </br><small style="color: grey">{{ field.help_text|safe }}</small>
+					{% endif %}
+					{% for error in field.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				  </p>
+				{% endfor %}
+				<button class="btn btn-info" type="submit" name="btn_new_payment">Criar</button>
+				<input type="button" class="btn btn_cancel_modal" value="Cancel" />
+			</form>
+		</div>
+	  </div>
+	</div>
+</div>	
+
+<!-- Modal de editar pagamento existente -->
+  <div class="modal fade" id="modal_editPayment" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Tipo de Pagamento</h4>
+        </div>
+
+        <div class="modal-body">
+
+			<form class="form-horizontal" method="POST">
+			{% csrf_token %}
+		    <fieldset>
+		        <div class="control-group">
+		            <label class="control-label" for="modal_edit_payment_name">Tipo de Pagamento</label>
+		            <div class="controls">
+		                <input id="modal_edit_payment_name" name="modal_edit_payment_name" class="input-xlarge disabled" type="text" type="text"/>
+						<input id="modal_edit_id" name="modal_edit_id" type="hidden" name="modal_edit_id"/>
+		            </div>
+		        </div>
+				<br>
+		        <div class="control-group">
+		            <div class="controls">
+		                <input type="submit" class="btn btn-primary" name="btn_edit_payment" value="Editar" />
+		                <input type="button" class="btn btn_cancel_modal" value="Cancel" />
+		            </div>
+		        </div>
+		    </fieldset>
+			</form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+
+
+
+<script>
+
+$(document).ready(function(){
+
+   $(".id_newPayment").click(function(){
+     $('#modal_newPayment').modal('show');
+   });
+
+   $(".id_editPayment").click(function(){
+     $("#modal_edit_payment_name").val($(this).data('name'));
+
+     $("#modal_edit_id").val($(this).data('id'));
+
+     $('#modal_editPayment').modal('show');
+   });
+
+    // Hide the Modals
+	$(".btn_cancel_modal").click(function(){
+        $("#modal_editPayment").modal("hide");
+    });
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
+});
+</script>
+
+
+
+
+{% endblock %}

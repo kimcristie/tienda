@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+	<div class="container pull-right">
+		  <br>
+		  <h2>Cadastro de Produto</h2>
+		<button class="btn btn-primary id_newProduct" data-toggle="modal_newProduct" type="button">Novo</button>
+	</div>
+	<br>
+	{% if produtos %}
+	<div class="container">
+
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+			<th>Nome do Produto</th>
+			<th>Cor</th>
+			<th>Preço da Cor</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for produto in produtos_cor %}
+		  <tr>
+			<td name="" value=""> 
+				<button class="btn id_editProduct" data-toggle="modal_editProduct" data-id="{{ produto.id }}" data-colour="{{ produto.colour }}" data-colour_price="{{ produto.colour_price }}" name="{{ produto.id }}" value="{{ produto.id }}" type="button">Editar</button> 
+			</td>
+			<td></td>
+			<td name="{{ produto.colour }}">{{ produto.colour }}</td>
+			<td name="{{ produto.colour }}">{{ produto.colour_price }}</td>
+		  </tr>
+		{% endfor %}
+
+
+		{% for produto in produtos %}
+		  <tr>
+			<td name="" value=""> 
+				<button class="btn id_editProduct" data-toggle="modal_editProduct" data-id="{{ produto.id }}" data-name="{{ produto.name }}" name="{{ produto.id }}" value="{{ produto.id }}" type="button">Editar</button> 
+			</td>
+			<td name="{{ produto.name }}">{{ produto.name }}</td>
+			<td></td>
+			<td></td>
+		  </tr>
+		{% endfor %}
+
+		</tbody>
+	  </table>
+	</div>
+	{% endif %}
+
+
+
+<!-- Modal novo produto-->
+<div class="modal fade" id="modal_newProduct" role="dialog">
+	<div class="modal-dialog">
+	  <!-- Modal content-->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h4 class="modal-title">Novo Produto</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" method="POST">
+				{% csrf_token %}
+				{% for field in form %}
+				  <p>
+					{{ field.label_tag }}<br>
+					{{ field }}
+					
+					{% if field.help_text %}
+					  </br><small style="color: grey">{{ field.help_text|safe }}</small>
+					{% endif %}
+					{% for error in field.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				  </p>
+				{% endfor %}
+				<br>
+				<button class="btn btn-info" type="submit" name="btn_new_product">Criar</button>
+				<input type="button" class="btn btn_cancel_modal" value="Cancel" />
+			</form>
+		</div>
+	  </div>
+	</div>
+</div>	
+
+<!-- Modal de editar produto existente -->
+  <div class="modal fade" id="modal_editProduct" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Produto</h4>
+        </div>
+
+        <div class="modal-body">
+
+			<form class="form-horizontal" method="POST">
+			{% csrf_token %}
+		    <fieldset>
+		        <div class="control-group">
+		            <label class="control-label" for="modal_edit_product_name">Nome do Produto</label>
+		            <div class="controls">
+		                <input id="modal_edit_product_name" name="modal_edit_product_name" class="input-xlarge disabled" type="text" type="text"/>
+						<input id="modal_edit_id" name="modal_edit_id" type="hidden" name="modal_edit_id"/>
+		            </div>
+		        </div>
+				<br>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_product_colour">Cor do Produto</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_product_colour" name="modal_edit_product_colour" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_product_colour">Preço da Cor</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_product_colour_price" name="modal_edit_product_colour_price" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+
+				<br>
+		        <div class="control-group">
+		            <div class="controls">
+		                <input type="submit" class="btn btn-primary" name="btn_edit_product" value="Editar" />
+		                <input type="button" class="btn btn_cancel_modal" value="Cancel" />
+		            </div>
+		        </div>
+		    </fieldset>
+			</form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+
+
+
+<script>
+
+$(document).ready(function(){
+
+   $(".id_newProduct").click(function(){
+     $('#modal_newProduct').modal('show');
+   });
+
+   $(".id_editProduct").click(function(){
+     $("#modal_edit_product_name").val($(this).data('name'));
+     $("#modal_edit_product_colour").val($(this).data('colour'));
+     $("#modal_edit_product_colour_price").val($(this).data('colour_price'));
+
+     $("#modal_edit_id").val($(this).data('id'));
+
+     $('#modal_editProduct').modal('show');
+   });
+
+    // Hide the Modals
+	$(".btn_cancel_modal").click(function(){
+        $("#modal_editProduct").modal("hide");
+    });
+
+
+  	//campo pesquisar tabela
+  $("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
+
+});
+</script>
+
+
+
+
+{% endblock %}

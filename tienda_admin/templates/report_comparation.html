@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="background-color: #ececec">
+
+	  <form class="form-inline" method="POST">
+
+			{% csrf_token %}
+			<div class="col-sm-12 table-responsive">
+		
+				<table class="table">
+					<thead>
+						<tr><th><h2>  Relatório Comparativo Mensal Anual</h2> <small style="color: grey">comparativo de vendas totais nos meses e anos escolhido</small></tr></th>
+						
+					</thead>
+					<tbody>
+					<tr class="col-sm-12 table-responsive">
+						<td>
+							<input id="id_input_date_inicio" type='text' style="width:70px"  name='input_date_inicio' value="" placeholder="12/2017" required>
+							</br><small style="color: grey">mes/ano</small>
+						</td>
+
+						<td>
+							<input id="id_input_date_final" type = 'text' style="width:70px" name='input_date_final' value="" placeholder="12/2018" required>
+							</br><small style="color: grey">mes/ano</small>
+						</td>
+						<td>
+							<select id="id_select_dropdown_list_customer" name="select_dropdown_list_customer" class="js-example-basic-single">
+								<option id="id_default-option-owners_new" style="display:none" disabled selected value ></option>
+								{% for expositor in expositores %} 
+								 <option value="{{ expositor.owner }}" name="chosen_new_owner">{{ expositor.owner }}</option>
+								{% endfor %}
+							</select>
+							</br><small style="color: grey">Expositor. Para relatorio geral, deixar em branco</small>
+						</td>
+						<td>
+							<button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_create_report">Visualizar</button>	
+						</td>
+						{% if report_customer_inicio or report_customer_final %}
+						<td> 
+						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_comparation&date_input_inicio={{start_date_date|date:'M Y'}}&date_input_final={{end_date_date|date:'M Y'}}&filename_name=relatorio_comparativo_{% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %}_&sheet_name=Comparativo_Anual_{% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %}&obj_html=<table>{% for inputs in report_customer_inicio %}<tr><td>{{ inputs.create_date|date:'d D' }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>&obj_html2=<table>{% for inputs in report_customer_final %}<tr><td>{{ inputs.create_date|date:'d D' }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>">Exportar</a>
+						</td>
+					{% endif %}
+					</tr>
+				</tbody>
+
+				</table>
+
+
+
+
+
+</form>
+</div>
+<hr style="border-color: #f4511e">
+</div>
+</div><br>
+
+<!-- ############################################################################################################ -->
+
+
+{% if report_customer_inicio %}
+<h3>Comparativo Vendas Anual {% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %} {{ start_date_date|date:"M Y" }} e {{ end_date_date|date:"M Y" }}</h3>
+
+<div class="row">
+	<div class="column">
+	  <table class="table table-striped">
+		<thead>
+		 <tr><th>{{ start_date_date|date:'M Y' }}</th></tr>
+		  <tr>
+			<th>Dia</th>
+			<th>Venda Total</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for inputs in report_customer_inicio %}
+		  <tr>
+			<td name="{{ inputs.create_date }}">{{ inputs.create_date|date:'d D' }}</td>
+			<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div> <!-- <div class="column"> -->
+
+	<div class="column">
+	  <table class="table table-striped">
+		<thead>
+		 <tr><th>{{ end_date_date|date:'M Y' }}</th></tr>
+		  <tr>
+			<th>Dia</th>
+			<th>Venda Total</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for inputs in report_customer_final %}
+		  <tr>
+			<td name="{{ inputs.create_date }}">{{ inputs.create_date|date:'d D' }}</td>
+			<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div> <!-- <div class="column"> -->
+
+
+
+</div>
+
+
+{% endif %}
+
+<!-- #######################################################################################################################-->
+
+
+
+<style>
+* {
+	box-sizing: border-box;
+}
+
+.column {
+	float:left;
+	width:50%;
+	padding:10px;
+}
+
+.row:after{
+	content:"";
+	display:table;
+	clear:both;
+}
+
+
+#id-link-btn-xls:link, #id-link-btn-xls:visited {
+  background-color: #47C758;
+  color: white;
+  padding: 3px 11px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+
+#id-link-btn-xls:hover, #id-link-btn-xls:active {
+  background-color: green;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+	// In your Javascript (external .js resource or <script> tag) MUITO IMPORTANTE FAZ O DROPDOWN DAR PRA FAZER AUTOCOMPLETE
+    $('.js-example-basic-single').select2();
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+
+
+});
+
+
+</script>
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+

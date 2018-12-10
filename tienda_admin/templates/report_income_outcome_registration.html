@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div style="background-color: #ececec">
+
+	  <form class="form-inline" method="POST">
+
+			{% csrf_token %}
+			<div class="col-sm-12 table-responsive">
+		
+				<table class="table">
+					<thead>
+						<tr><th><h2>Relatório de Receita da Loja</h2></tr></th>
+						
+					</thead>
+					<tbody>
+					<tr class="col-sm-12 table-responsive">
+						<td>
+							<label>Data Início</label> <input id="data_datepicker" type = 'date' name='input_date_begin' value="" required>
+						</td>
+						<td>
+							<label>Data Fim</label> <input id="data_datepicker" type = 'date' name='input_date_end' value="" required>
+						</td>
+						<td>
+							<br><button class="btn btn-info btn-sm pull-right"type="submit" style=”float: right” name="btn_search_dates">Visualizar</button>	
+						</td>
+					{% if income_outcomes_range_date %}
+						<td> 
+						 <br>
+						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_income_outcome&date_input_inicio={{ start_date }}&date_input_final={{ end_date }}&filename_name=relatorio_receita_loja_&sheet_name=Receita&total_vendas_receita_total={{ total_vendas_receita_total|floatformat:2 }}&total_vendas_receita_total={{ total_vendas_receita_total|floatformat:2 }}&total_comissao_tienda={{ total_comissao_tienda|floatformat:2 }}&total_aluguel_expositores={{ total_aluguel_expositores|floatformat:2 }}&total_saidas={{ total_saidas|floatformat:2 }}&total_entradas={{ total_entradas|floatformat:2 }}&total_receita_final={{ total_receita_final|floatformat:2 }}&obj_html=<table>{% for income_outcome in income_outcomes_range_date %}<tr><td>{{ income_outcome.create_date }}</td><td>{{ income_outcome.description }}</td><td>{{ income_outcome.value }}</td><td>{{ income_outcome.is_income | yesno:'Sim,Não' }}</td><td>{{ income_outcome.is_outcome | yesno:'Sim,Não' }}</td></tr>{% endfor %}</table>">Exportar</a>
+						</td>
+					{% endif %}
+					</tr>
+				</tbody>
+
+				</table>
+
+</form>
+</div>
+<hr style="border-color: #f4511e">
+</div>
+</div><br>
+
+<!-- ############################################################################################################ -->
+
+
+
+{% if income_outcomes_range_date %}
+
+	<div class="container">  
+	
+	
+	<h3>Receita da Loja de {{ start_date_date|date:"d M Y" }} à {{ end_date_date|date:"d M Y" }} </h3>  
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th>Data</th>
+            <th>Descrição</th>
+			<th>Valor</th>
+            <th>É Entrada?</th>
+            <th>É Saída?</th>
+		  </tr>
+		</thea d>
+		<tbody id="id_table">
+		{% for income_outcome in income_outcomes_range_date %}
+		  <tr>
+			<td name="{{ income_outcome.create_date }}">{{ income_outcome.create_date }}</td>
+			<td name="{{ income_outcome.description }}">{{ income_outcome.description }}</td>
+            <td name="{{ income_outcome.value }}">{{ income_outcome.value }}</td>
+			<td name="{{ income_outcome.is_income }}">{{ income_outcome.is_income | yesno:"Sim,Não" }}</td>
+			<td name="{{ income_outcome.is_outcome }}">{{ income_outcome.is_outcome | yesno:"Sim,Não" }}</td>
+		  </tr>
+		{% endfor %}
+
+		<tr>
+			<td><b>Receita Geral</b></td>
+			<td>{{ total_vendas_receita_total|floatformat:2  }}</td>
+		</tr>
+		<tr>
+			<td><b>Comissão Expositores</b></td>
+			<td>{{ total_comissao_tienda|floatformat:2  }}</td>
+		</tr>
+		<tr>
+			<td><b>Aluguel Expositores</b></td>
+			<td>{{ total_aluguel_expositores  }}</td>
+		</tr>
+		<tr>
+			<td><b>Total Entradas</b></td>
+			<td>{{ total_entradas|floatformat:2  }}</td>
+		</tr>
+		<tr>
+			<td><b>Total Saídas</b></td>
+			<td>{{ total_saidas|floatformat:2  }}</td>
+		</tr>
+		<tr>
+			<td><b>Total Receita Final</b></td>
+			<td>{{ total_receita_final|floatformat:2  }}</td>
+		</tr>
+
+		</tbody>
+	  </table>
+	</div>
+{% endif %}
+
+
+
+<style>
+table.table-topo {
+    width: 100%;
+}
+
+table.id-table-menu-top {
+    width: auto;
+    margin-right: 0px;
+    margin-left: auto;
+}
+
+
+#id-link-btn-xls:link, #id-link-btn-xls:visited {
+  background-color: #47C758;
+  color: white;
+  padding: 3px 11px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+
+#id-link-btn-xls:hover, #id-link-btn-xls:active {
+  background-color: green;
+}
+
+</style>
+
+<script>
+$(document).ready(function(){
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+});
+
+</script>
+
+
+
+
+{% endblock %}

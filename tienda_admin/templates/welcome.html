@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<head>
+	<style>
+	.jumbotron {
+	  background-color: #abb2b9;
+	  color: #fff;
+	}
+	</style>
+</head>
+
+
+<div class="jumbotron text-center">
+  <h1>Bem vindo ao Tienda de Ideias</h1> 
+  <p>Tenha um bom dia de trabalho!</p>
+
+</div>
+<br>
+<br>
+<a id="id-click-btn" style="background-color: #abb2b9; color:#fff" class="nav-link text-center" href="{% url 'home' %}">Vamos começar esse dia lindo? Vá para entrada diário ;) </a>
+
+<script>
+$(document).ready(function(){
+    $("#id-click-btn").mouseover(function(){
+        $("#id-click-btn").css("background-color", "#f4511e");
+    });
+    $("#id-click-btn").mouseout(function(){
+        $("#id-click-btn").css("background-color", "#abb2b9");
+    });
+});
+
+</script>
+{% else %}
+  <main class="container d-flex h-100">
+    <div class="container row justify-content-center align-self-center" style="top:20px;">
+  <h2></h2>
+  <p></p>
+	
+  	<div class="card">
+		<form method="post">
+		<div class="card-header"></div>
+		<div class="card-body">
+			<p>Você não está logado</p>
+  			<a href="{% url 'login' %}">clique para login</a>
+		</div> 
+		
+		</form>
+	  </div>
+	  <br>
+	</div> 
+  </main>
+
+{% endif %}
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

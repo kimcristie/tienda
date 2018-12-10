@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<div class="container">
+		<br>
+		<h2>Cadastro de Expositor</h2>
+		<button class="btn btn-primary id_newUser" data-toggle="modal_new" type="button">Novo</button>
+	</div><br>
+
+	<div class="container">    
+	  <table class="table table-striped">
+		<thead>
+		  <tr>
+			<th><input id="searchInput" type="text" placeholder="Pesquisar.."></th>
+			<th>Expositor</th>
+            <th>Dono (Expositor)</th>
+			<th>Aluguel</th>
+			<th>Comissão %</th>
+            <th>Está Ativo?</th>
+            <th>E-mail</th>
+            <th>Contato (tel)</th>
+            <th>Endereço</th>
+		  </tr>
+		</thead>
+		<tbody id="id_table">
+		{% for expositor in expositores %}
+		  <tr>
+			<td name="" value=""> <button class="btn id_editUser" data-toggle="modal_edit" data-id="{{ expositor.id }}" data-owner="{{ expositor.owner }}" data-store_name="{{ expositor.store_name }}" data-rent="{{ expositor.rent }}" data-perc_commission="{{ expositor.perc_commission }}" data-ativo="{{ expositor.is_active }}" data-store_phone="{{ expositor.store_phone }}" data-store_address="{{ expositor.store_address }}" data-email="{{ expositor.email }}" name="{{ expositor.id }}" value="{{ expositor.id }}" type="button">Editar</button> </td>
+			<td name="{{ expositor.store_name }}">{{ expositor.store_name }}</td>
+			<td name="{{ expositor.owner }}">{{ expositor.owner }}</td>
+            <td name="{{ expositor.rent }}">{{ expositor.rent }}</td>
+			<td name="{{ expositor.perc_commission }}">{{ expositor.perc_commission }}</td>
+			<td name="{{ expositor.is_active }}">{{ expositor.is_active | yesno:"Sim,Não" }}</td>
+			<td name="{{ expositor.email }}">{{ expositor.email }}</td>
+            <td name="{{ expositor.store_phone }}">{{ expositor.store_phone }}</td>
+			<td name="{{ expositor.store_address }}">{{ expositor.store_address }}</td>
+		  </tr>
+		{% endfor %}
+		</tbody>
+	  </table>
+	</div>
+
+
+
+<!-- Modal novo expositor-->
+
+
+<div class="modal fade" id="modal_new" role="dialog">
+	<div class="modal-dialog">
+	  <!-- Modal content-->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h4 class="modal-title">Novo Expositor</h4>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal" method="POST">
+				{% csrf_token %}
+
+				<p name="store_name"> 
+					{{ form.store_name.label_tag }} <br>
+					{{ form.store_name }}
+
+					{% if form.store_name.help_text %}
+					  </br><small style="color: grey">{{ form.store_name.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.store_name.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+
+				<div >
+				<label for="modal_new_owner">Tem dono ja cadastrado?</label>
+				<label><input type="radio" name="post-format" id="radio-owner-yes_new" value="radio-owner-yes_new" checked>Sim</label>
+				<label><input type="radio" name="post-format" id="radio-owner-no_new" value="radio-owner-no_new">Não</label>
+				</div>
+
+				<div id="dropdown-owners_new" class="dropdown">
+				<select id="id_selected-dropdown-owners_new" name="selected-dropdown-owners_new">
+					<option id="id_default-option-owners_new" style="display:none" disabled selected value ></option>
+					{% for expositor in expositores_owners %} 
+					 <option value="{{ expositor.owner }}" name="chosen_new_owner">{{ expositor.owner }}</option>
+					{% endfor %}
+				</select>
+				</div><br>
+
+				<div id="div-owner-input_new">
+				<p> 
+					{{ form.owner.label_tag }} <br>
+					<span id="modal_new_owner" name="modal_new_owner" >{{ form.owner }}</span>
+
+					{% if form.store_name.help_text %}
+					  </br><small style="color: grey">{{ form.owner.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.owner.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+				</div>
+
+				<p> 
+					{{ form.rent.label_tag }} <br>
+					{{ form.rent }}
+
+					{% if form.rent.help_text %}
+					  </br><small style="color: grey">{{ form.rent.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.rent.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+				<p> 
+					{{ form.perc_commission.label_tag }} <br>
+					{{ form.perc_commission }}
+
+					{% if form.perc_commission.help_text %}
+					  </br><small style="color: grey">{{ form.perc_commission.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.perc_commission.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+				<p> 
+					{{ form.email.label_tag }} <br>
+					{{ form.email }}
+
+					{% if form.email.help_text %}
+					  </br><small style="color: grey">{{ form.email.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.email.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+				<p> 
+					{{ form.store_phone.label_tag }} <br>
+					{{ form.store_phone }}
+
+					{% if form.store_phone.help_text %}
+					  </br><small style="color: grey">{{ form.store_phone.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.store_phone.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+				<p> 
+					{{ form.store_address.label_tag }} <br>
+					{{ form.store_address }}
+
+					{% if form.store_address.help_text %}
+					  </br><small style="color: grey">{{ form.store_address.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.store_address.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+				<p> 
+					{{ form.is_active.label_tag }} <br>
+					{{ form.is_active }}
+
+					{% if form.is_active.help_text %}
+					  </br><small style="color: grey">{{ form.is_active.help_text|safe }}</small>
+					{% endif %}
+					{% for error in form.is_active.errors %}
+					  </br><p style="color: red">{{ error }}</p>
+					{% endfor %}
+				</p>
+
+				<button class="btn btn-info" type="submit" name="btn_signup">Criar</button>
+				<input type="button" class="btn btn_cancel_modal" value="Cancel" />
+			</form>
+		</div>
+	  </div>
+	</div>
+</div>	
+
+
+
+<!-- Modal -->
+  <div class="modal fade" id="modal_edit" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar Expositor</h4>
+        </div>
+
+        <div class="modal-body">
+			<form class="form-horizontal" method="POST">
+			{% csrf_token %}
+		    <fieldset>
+		        <div class="control-group">
+		            <label class="control-label" for="modal_edit_store_name">Expositor</label>
+		            <div class="controls">
+		                <input id="modal_edit_store_name" name="modal_edit_store_name" class="input-xlarge disabled" type="text" type="text"/>
+						<input id="modal_edit_id" name="modal_edit_id" type="hidden" name="modal_edit_id"/>
+		            </div>
+		        </div>
+
+                <br>
+				<div class="control-group">
+				<label class="control-label" for="modal_edit_owner">Tem dono ja cadastrado?</label>
+				<label><input type="radio" name="post-format" id="radio-owner-yes" value="radio-owner-yes" checked>Sim</label>
+				<label><input type="radio" name="post-format" id="radio-owner-no" value="radio-owner-no">Não</label>
+
+				</div>
+
+				<div id="dropdown-owners" class="dropdown">
+				<select id="id_selected-dropdown-owners" name="selected-dropdown-owners">
+					<option id="id_default-option-owners" style="display:none" disabled selected value ></option>
+					{% for expositor in expositores_owners %} 
+					 <option value="{{ expositor.owner }}" name="chosen_edit_owner">{{ expositor.owner }}</option>
+					{% endfor %}
+				</select>
+				</div><br>
+
+				<div id="div-owner-input" class="control-group">
+		            <label class="control-label" for="modal_edit_owner">Dono (expositor)</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_owner" name="modal_edit_owner" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+
+                <div class="control-group">
+		            <label class="control-label" for="modal_edit_rent">Aluguel</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_rent" name="modal_edit_rent" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+                <div class="control-group">
+		            <label class="control-label" for="modal_edit_perc_commission">Comissão %</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_perc_commission" name="modal_edit_perc_commission" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_email">E-mail</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_email" name="modal_edit_email" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+                <div class="control-group">
+		            <label class="control-label" for="modal_edit_store_phone">Contato (tel)</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_store_phone" name="modal_edit_store_phone" />
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+                <div class="control-group">
+		            <label class="control-label" for="modal_edit_store_address">Endereço</label>
+		            <div class="controls">
+		                <input type="text" class="input-xlarge" id="modal_edit_store_address" name="modal_edit_store_address"/>
+		                <p class="help-block"></p>
+		            </div>
+		        </div>
+
+				<div class="control-group">
+		            <label class="control-label" for="modal_edit_active">Ativo?</label>
+		            <div class="controls">
+		                <input type="checkbox"  class="input-xlarge" id="modal_edit_active" name="modal_edit_active">
+						<p class="help-block"></p>
+		            </div>
+		        </div>
+
+		        <div class="control-group">
+		            <div class="controls">
+		                <input type="submit" class="btn btn-primary" name="btn_edit_user" value="Editar" />
+		                <input type="button" class="btn btn_cancel_modal" value="Cancel" />
+		            </div>
+		        </div>
+		    </fieldset>
+			</form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+
+<script>
+$(document).ready(function(){
+    // Show the Modal edit user
+	//$("#id_editUser").click(function(){
+	//    $("#modal_edit").modal("show");
+    //});
+
+   $(".id_newUser").click(function(){
+     $('#modal_new').modal('show');
+   });
+
+   $(".id_editUser").click(function(){
+     $("#modal_edit_owner").val($(this).data('owner'));
+
+     //pra colocar no modal editar o valor atual do owner
+     $("#id_default-option-owners").val($(this).data('owner'));
+     $("#id_default-option-owners").text($(this).data('owner'));
+	 $("#id_selected-dropdown-owners option[value='id_default-option-owners']").prop('selected', true);
+    // you need to specify id of combo to set right combo, if more than one combo
+
+
+
+
+     $("#modal_edit_store_name").val($(this).data('store_name'));
+     $("#modal_edit_rent").val($(this).data('rent'));
+     $("#modal_edit_perc_commission").val($(this).data('perc_commission'));
+     $("#modal_edit_store_address").val($(this).data('store_address'));
+     $("#modal_edit_store_phone").val($(this).data('store_phone'));
+     $("#modal_edit_email").val($(this).data('email'));
+
+	 value_active = $(this).data('ativo');
+     if(value_active == "True"){
+         $('#modal_edit_active').attr('checked', true);
+     }else{
+         $('#modal_edit_active').attr('checked', false);
+     };
+     $("#modal_edit_id").val($(this).data('id'));
+
+     $('#modal_edit').modal('show');
+	 
+   });
+
+    // Hide the Modals
+	$(".btn_cancel_modal").click(function(){
+        $("#modal_edit").modal("hide");
+    });
+
+	//para fazer o radio buttn do edit funcionar
+    $(function() {
+    $('input[name=post-format]').on('click init-post-format', function() {
+        $('#div-owner-input').toggle($('#radio-owner-no').prop('checked'));
+    }).trigger('init-post-format');
+    });
+
+    $(function() {
+    $('input[name=post-format]').on('click init-post-format', function() {
+        $('#dropdown-owners').toggle($('#radio-owner-yes').prop('checked'));
+    }).trigger('init-post-format');
+    });
+
+    //para copiar o valor do select dropdown pro input do owner pra que na view, pegue o valor do input só
+	$("#id_selected-dropdown-owners").on("change", function () {    //when selected value changed
+		$("#modal_edit_owner[type=text]").val($(this).val());  //change value in textbox
+	})
+
+	
+
+    // NO NOVO MODAL EXPOSITOR
+
+	$(function() {
+    $('input[name=post-format]').on('click init-post-format', function() {
+        $('#div-owner-input_new').toggle($('#radio-owner-no_new').prop('checked'));
+    }).trigger('init-post-format');
+    });
+
+    $(function() {
+    $('input[name=post-format]').on('click init-post-format', function() {
+        $('#dropdown-owners_new').toggle($('#radio-owner-yes_new').prop('checked'));
+    }).trigger('init-post-format');
+    });
+
+	//para copiar o valor do select dropdown pro input do owner pra que na view, pegue o valor do input só
+	$("#id_selected-dropdown-owners_new").on("change", function () {    //when selected value changed
+		$("#modal_new_owner > input[type=text]").val($(this).val());  //change value in textbox input inside the span cause I cant access the input form
+	})
+
+
+	//campo pesquisar tabela
+	$("#searchInput").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#id_table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+    });
+
+});
+
+</script>
+
+
+
+
+{% endblock %}
