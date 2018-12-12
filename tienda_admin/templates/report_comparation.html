@@ -39,7 +39,7 @@
 						</td>
 						{% if report_customer_inicio or report_customer_final %}
 						<td> 
-						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_comparation&date_input_inicio={{start_date_date|date:'M Y'}}&date_input_final={{end_date_date|date:'M Y'}}&filename_name=relatorio_comparativo_{% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %}_&sheet_name=Comparativo_Anual_{% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %}&obj_html=<table>{% for inputs in report_customer_inicio %}<tr><td>{{ inputs.create_date|date:'d D' }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>&obj_html2=<table>{% for inputs in report_customer_final %}<tr><td>{{ inputs.create_date|date:'d D' }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>">Exportar</a>
+						  <a id="id-link-btn-xls" href="{% url 'export_xls' %}?report_name=report_comparation&date_input_inicio={{start_date_date|date:'M Y'}}&date_input_final={{end_date_date|date:'M Y'}}&filename_name=relatorio_comparativo_{% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %}_&sheet_name=Comparativo_Anual_{% if input_customer %} de {{ input_customer }}{% else %} Geral {% endif %}&soma_total_mes_final={{ soma_total_mes_final }}&soma_total_mes_inicio={{ soma_total_mes_inicio }}&obj_html=<table>{% for inputs in report_customer_inicio %}<tr><td>{{ inputs.create_date|date:'d D' }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>&obj_html2=<table>{% for inputs in report_customer_final %}<tr><td>{{ inputs.create_date|date:'d D' }}</td><td>{{ inputs.final_price }}</td></tr>{% endfor %}</table>">Exportar</a>
 						</td>
 					{% endif %}
 					</tr>
@@ -80,6 +80,12 @@
 			<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
 		  </tr>
 		{% endfor %}
+
+		<tr>
+			<td><b>Total mês</b></td>
+			<td>{{ soma_total_mes_inicio|floatformat:2 }}</td>
+		</tr>
+
 		</tbody>
 	  </table>
 	</div> <!-- <div class="column"> -->
@@ -100,6 +106,10 @@
 			<td name="{{ inputs.final_price }}">{{ inputs.final_price }}</td>
 		  </tr>
 		{% endfor %}
+		<tr>
+			<td><b>Total mês</b></td>
+			<td>{{ soma_total_mes_final|floatformat:2 }}</td>
+		</tr>
 		</tbody>
 	  </table>
 	</div> <!-- <div class="column"> -->

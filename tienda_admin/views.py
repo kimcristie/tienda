@@ -90,10 +90,6 @@ def home(request):
                 traceback.print_exc()
                 #pass
         elif 'btn_create_input' in request.POST:
-            print("O QUE TA VINDO NO REQUEST POST")
-            print(request.POST)
-            #input_id = int(request.POST['modal_edit_id'])
-            #input_object = DailyInput.objects.get(id=dailyinput_id)
 
             input_expositor = (request.POST['selected-dropdown-expositor'])
             if input_expositor:
@@ -129,8 +125,6 @@ def home(request):
 
             input_object = DailyInput(create_date=input_create_date , updated_by=input_user , customer=input_expositor_object, payment_type=input_payment_object , product_type=input_product_object , product_colour=input_product_colour_object , qtd=input_qtd , obs=input_obs , is_troca=input_is_troca ,un_price=input_un_price , final_price=calc_final_price )
 
-            print("ATENCAO O QUE TA SALVO NO OBJETO INPUT DIARIO")
-            print(input_object)
             input_object.save()#force_insert=True)
             return redirect('home')
     else:
@@ -418,6 +412,7 @@ def report_daily(request):
     #DailyInput.objects.filter(id=21).delete()
 
     if request.method == 'POST':
+
         date_input = request.POST['input_date']
 
         if('select_dropdown_list_customer' in request.POST):
@@ -701,6 +696,8 @@ def report_comparation(request):
     date_inicio_mes = ""
     date_final_ano = ""
     date_final_mes = ""
+    soma_total_mes_inicio = 0
+    soma_total_mes_final = 0
 
     if request.method == 'POST':
         start_date = (request.POST['input_date_inicio'])
@@ -708,10 +705,6 @@ def report_comparation(request):
 
         if 'select_dropdown_list_customer' in request.POST:
             input_customer = request.POST['select_dropdown_list_customer'] #PARA PEGAR owner
-
-
-        print("o q ta vindo input_customer")
-        print(input_customer)
 
         #buscar todos do mes e ano e agrupar o final_price por dia
         start_date_date = datetime.strptime(start_date.replace("/","-"), "%m-%Y")
@@ -729,6 +722,21 @@ def report_comparation(request):
 
             report_customer_final = DailyInput.objects.filter(create_date__year=end_date_date.year, create_date__month=end_date_date.month).values('create_date').annotate(final_price = Sum('final_price')).order_by('create_date')
 
+
+        #para pegar total do mês
+        soma_mes_inicio = 0
+        for loop_soma_inicio in report_customer_inicio:
+            soma_mes_inicio = soma_mes_inicio + loop_soma_inicio['final_price']
+        soma_total_mes_inicio = soma_mes_inicio
+
+
+        #para pegar total do mês
+        soma_mes_final = 0
+        for loop_soma_final in report_customer_final:
+            soma_mes_final = soma_mes_final + loop_soma_final['final_price']
+        soma_total_mes_final = soma_mes_final
+
+
         date_inicio_ano = start_date_date.year
         date_inicio_mes = start_date_date.month
 
@@ -738,7 +746,7 @@ def report_comparation(request):
 
 
 
-    return render(request, 'report_comparation.html', {'input_customer':input_customer, 'expositores':expositores, 'report_customer_inicio':report_customer_inicio, 'report_customer_final':report_customer_final,'start_date':start_date, 'end_date':end_date, 'start_date_date':start_date_date, 'end_date_date':end_date_date,'date_inicio_ano':date_inicio_ano, 'date_inicio_mes':date_inicio_mes, 'date_final_ano':date_final_ano, 'date_final_mes':date_final_mes})
+    return render(request, 'report_comparation.html', {'input_customer':input_customer, 'expositores':expositores, 'report_customer_inicio':report_customer_inicio, 'report_customer_final':report_customer_final,'start_date':start_date, 'end_date':end_date, 'start_date_date':start_date_date, 'end_date_date':end_date_date,'date_inicio_ano':date_inicio_ano, 'date_inicio_mes':date_inicio_mes, 'date_final_ano':date_final_ano, 'date_final_mes':date_final_mes, 'soma_total_mes_final':soma_total_mes_final, 'soma_total_mes_inicio':soma_total_mes_inicio})
 
 
 
@@ -851,9 +859,20 @@ def export_xls(request):
                 col_num = col_num + 1
 
 
-
         #comparacao anual tem dois htmls
         if report_name == 'report_comparation':
+            #pra ter o total do inicio, na primeira coluna e com o row que tava no primeiro objeto html pq abaixo nesse segundo html o rows zera pra colocar a coluna do lado
+            font_style = xlwt.XFStyle()
+            font_style.font.bold = True
+            soma_total_mes_inicio = request.GET.get('soma_total_mes_inicio')
+            ws.write(row_num+1, 0, "Total mês", font_style)
+            ws.write(row_num+1, 1, soma_total_mes_inicio)
+
+
+
+            # Sheet body, remaining rows
+            font_style = xlwt.XFStyle()
+
             soup = BeautifulSoup(html_table_inputs_diario2, 'lxml')
             table = soup.find("table")
             rows = table.findAll("tr")
@@ -872,6 +891,11 @@ def export_xls(request):
                     ws.write(row_num, col_num, td.text, font_style)
                     col_num = col_num + 1
 
+            font_style = xlwt.XFStyle()
+            font_style.font.bold = True
+            soma_total_mes_final = request.GET.get('soma_total_mes_final')
+            ws.write(row_num+1, 2, "Total mês", font_style)
+            ws.write(row_num+1, 3, soma_total_mes_final)
 
 
 

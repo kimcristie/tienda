@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'v=p-_ho(#)%3l9mr8g%8ent(1%#j58_2k33_3i^(5&thn*icg7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False #True
 
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com', '.tiendadeideas.com.br']
 
